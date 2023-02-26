@@ -29,7 +29,7 @@ jobs:
                 if git apply --verbose  --check "$patch" > /dev/null 2>&1; then
                   echo "Patch $(basename "${patch%.*}") was already applied, skipping"
                 else
-                  echo ("Partially applied, or not applied at all")
+                  echo "Partially applied, or not applied at all"
                   if git apply --verbose --reverse --check "$patch" > /dev/null 2>&1; then
                       git apply --reject --whitespace=fix "$patch" || exit 1
                       echo "Applied patch ${patch##*/}"
