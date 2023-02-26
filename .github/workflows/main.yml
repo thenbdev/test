@@ -17,11 +17,11 @@ jobs:
 
       - name: Apply patches
         # if: hashFiles('$PATCH_DIR')!=''  #TODO: why is this not working
-        run: |        
+        run: |
+          shopt -s nullglob
           [ -d "$PATCH_DIR" ] || { echo "Patch directory $PATCH_DIR not found."; exit 0; }
 
           ls $PATCH_DIR
-
           for patch in "$PATCH_DIR"/**/*.patch; do
             echo "Starting ${patch}"
             if [[ -f "$patch" ]]; then
