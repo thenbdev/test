@@ -338,25 +338,21 @@ class Workspace:
 def get_desktop_page(page):
 	"""Applies permissions, customizations and returns the configruration for a page
 	on desk.
-
 	Args:
 	        page (json): page data
-
 	Returns:
 	        dict: dictionary of cards, charts and shortcuts to be displayed on website
 	"""
 	try:
 		workspace = Workspace(loads(page))
 		workspace.build_workspace()
-		json = {
+		return {
 			"charts": workspace.charts,
 			"shortcuts": workspace.shortcuts,
 			"cards": workspace.cards,
+			"onboardings": workspace.onboardings,
 			"quick_lists": workspace.quick_lists,
 		}
-		if frappe.session.user == "Administrator":
-			json["onboardings"] = workspace.onboardings
-		return json
 	except DoesNotExistError:
 		frappe.log_error("Workspace Missing")
 		return {}
@@ -381,7 +377,17 @@ def get_workspace_sidebar_items():
 
 	# pages sorted based on sequence id
 	order_by = "sequence_id asc"
-	fields = ["name", "title", "for_user", "parent_page", "content", "public", "module", "icon"]
+	fields = [
+		"name",
+		"title",
+		"for_user",
+		"parent_page",
+		"content",
+		"public",
+		"module",
+		"icon",
+		"is_hidden",
+	]
 	all_pages = frappe.get_all(
 		"Workspace", fields=fields, filters=filters, order_by=order_by, ignore_permissions=True
 	)
@@ -393,7 +399,7 @@ def get_workspace_sidebar_items():
 		try:
 			workspace = Workspace(page, True)
 			if has_access or workspace.is_permitted():
-				if page.public:
+				if page.public and (has_access or not page.is_hidden):
 					pages.append(page)
 				elif page.for_user == frappe.session.user:
 					private_pages.append(page)
@@ -547,12 +553,10 @@ def new_widget(config, doctype, parentfield):
 
 def prepare_widget(config, doctype, parentfield):
 	"""Create widget child table entries with parent details
-
 	Args:
 	        config (dict): Dictionary containing widget config
 	        doctype (string): Doctype name of the child table
 	        parentfield (string): Parent field for the child table
-
 	Returns:
 	        TYPE: List of Document objects
 	"""
@@ -583,11 +587,9 @@ def prepare_widget(config, doctype, parentfield):
 @frappe.whitelist()
 def update_onboarding_step(name, field, value):
 	"""Update status of onboaridng step
-
 	Args:
 	        name (string): Name of the doc
 	        field (string): field to be updated
 	        value: Value to be updated
-
 	"""
 	frappe.db.set_value("Onboarding Step", name, field, value)
