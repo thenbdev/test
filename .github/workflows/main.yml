@@ -20,6 +20,9 @@ jobs:
           ls
           pwd
           ls customisation/patches
+          echo env.PATCH_DIR
+          echo $PATCH_DIR
+          echo ${{env.PATCH_DIR}}
 
       - name: Apply patches
         if: hashFiles('env.PATCH_DIR')!=''
