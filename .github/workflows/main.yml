@@ -15,17 +15,13 @@ jobs:
           repository: thenbdev/Customisations
           path: customisation
 
-      - name: Logging
-        run: |
-          ls
-          pwd
-          ls customisation/patches
-          echo $PATCH_DIR
-          echo "$(hashFiles(env.PATCH_DIR))"
-
       - name: Apply patches
-        if: hashFiles('$PATCH_DIR')!=''
+        # if: hashFiles('$PATCH_DIR')!=''  #TODO: why is this not working
         run: |
+        
+          # Check if the patch directory exists
+          [ -d "$PATCH_DIR" ] || { echo "Patch directory $PATCH_DIR not found."; exit 0; }
+
           for patch in "$PATCH_DIR"*.patch; do
             if [[ -f "$patch" ]]; then
               if git log --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
