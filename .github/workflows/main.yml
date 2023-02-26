@@ -15,6 +15,14 @@ jobs:
           repository: thenbdev/Customisations
           path: customisation
 
+      - name: Logging
+        run: |
+          ls
+          pwd
+          ls customisation/patches
+          echo $PATCH_DIR
+          echo hashFiles('$PATCH_DIR')
+
       - name: Apply patches
         if: hashFiles('$PATCH_DIR')!=''
         run: |
