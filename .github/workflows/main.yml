@@ -40,7 +40,7 @@ jobs:
         if: ${{ env.PATCH_EXISTS }}
 
       - name: Cleanup
-        run: git rm customisation
+        run: rm -rf customisation
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
 
