@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PATCH_DIR: customisation/patches/${{github.event.repository.name}}
-      PATCH_EXISTS: true
+      PATCH_EXISTS: "true"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -20,14 +20,14 @@ jobs:
       - name: Check if patch directory exists
         run: |
           if [ ! -d "env.PATCH_DIR" ]; then
-            echo "Patch directory does not exist"
-            echo false >> $PATCH_EXISTS
+            echo "Patch directory does not exist. ${{ env.PATCH_DIR }}"
+            echo "false" >> env.PATCH_EXISTS
           fi
 
       # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
       - name: Apply patches
         run: |
-          for patch in "${{ github.workspace }}/$PATCH_DIR"*.patch; do
+          for patch in "$PATCH_DIR"*.patch; do
             if [[ -f "$patch" ]]; then
               if git log --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
                 echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
