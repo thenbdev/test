@@ -3,8 +3,9 @@ on: [push, pull_request]
 jobs:
   apply-old-patches:
     runs-on: ubuntu-latest
+    env:
+      PATCH_DIR: customisation/patches/${{github.event.repository.name}}
     steps:
-
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -17,37 +18,21 @@ jobs:
       # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
       - name: Apply patches
         run: |
-          ls
-          pwd
-          ls ..
-          # Loop through repo
-          cd customisation/
-
-
-          # Specify the directory containing the git patches
-          PATCH_DIR="customisation/patches/${{github.event.repository.name}}"
-
-          # Check if the patch directory exists
-          [ -d "$PATCH_DIR" ] || { echo "Patch directory $PATCH_DIR not found."; exit 0; }
-
-          # Change to the directory containing the git patches
-          cd "$PATCH_DIR" || { echo "Cannot change to directory $PATCH_DIR"; exit 1; }
-
-          # Loop through all the patch files in numeric order and apply them
-          for PATCH_FILE in $(ls -v *.patch)
-          do
-            # Check if the patch has already been applied
-            if git log -1 --grep="$PATCH_FILE" >/dev/null 2>&1; then
-              echo "Patch $PATCH_FILE has already been applied. Skipping..."
-            elif git apply --check "$PATCH_FILE"; then
-              echo "Applying patch $PATCH_FILE..."
-              git apply "$PATCH_FILE" || { echo "Error applying patch $PATCH_FILE"; exit 1; }
-            else
-              echo "Cannot apply patch $PATCH_FILE. Please resolve conflicts manually."
-              exit 1
+          for patch in "${{ github.workspace }}/$PATCH_DIR"*.patch; do
+            if [[ -f "$patch" ]]; then
+              if git log --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
+                echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
+              else
+                git apply --reject --whitespace=fix "$patch" || exit 1
+                echo "Applied patch $(basename "${patch%.*}")"
+              fi
             fi
           done
+        if: |
+          ${{ fileExists(env.PATCH_DIR) }}
 
+      - name: Cleanup
+        run: git rm customisation
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
 
