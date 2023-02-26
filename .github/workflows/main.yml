@@ -29,7 +29,7 @@ jobs:
               fi
             fi
           done
-        if: test -e env.PATCH_DIR
+        if: bash -c "test -e 'env.PATCH_DIR'"
 
 
       - name: Cleanup
