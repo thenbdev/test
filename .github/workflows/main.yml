@@ -15,17 +15,8 @@ jobs:
           repository: thenbdev/Customisations
           path: customisation
 
-      - name: Logging
-        run: |
-          ls
-          pwd
-          ls customisation/patches
-          echo env.PATCH_DIR
-          echo $PATCH_DIR
-          echo ${{env.PATCH_DIR}}
-
       - name: Apply patches
-        if: hashFiles('env.PATCH_DIR')!=''
+        if: hashFiles('$PATCH_DIR')!=''
         run: |
           for patch in "$PATCH_DIR"*.patch; do
             if [[ -f "$patch" ]]; then
