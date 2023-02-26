@@ -1,0 +1,58 @@
+name: NB Next customisations
+on: [push, pull_request]
+jobs:
+  apply-old-patches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
+      - name: Apply new patches
+        run: |
+          ls
+
+      - name: Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+
+
+  replacements:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Find and Replace links (direct/docs, youtube)
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: (erpnext.com|www.youtube.com)
+          replace: "nbnextlinks"
+          regex: true
+
+
+      - name: Find and Replace name
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: (ERP Next|ERPNext)
+          replace: "NB Next"
+          regex: true
+
+
+      # TODO: change the download/logo location to customsation repo
+      - name: Find and Replace logo
+        if: ${{ hashFiles('**/erpnext-logo.*') }}
+        # TODO: figure out where is the file and replace it. currently static handling
+        run: |
+          cd erpnext/public/images
+          rm erpnext-logo.svg erpnext-logo.png erpnext-favicon.svg
+          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.svg
+          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.png
+          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-favicon.svg
+
+
+      - name: Restore unwanted changes
+        run: |
+          git status
+          git restore --source=HEAD --staged --worktree -- .github
+          git status
+
+      - name: Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v4
