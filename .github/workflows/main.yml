@@ -5,7 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PATCH_DIR: customisation/patches/${{github.event.repository.name}}
-      PATCH_EXISTS: "true"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -15,15 +14,7 @@ jobs:
         with:
           repository: thenbdev/Customisations
           path: customisation
-
-      
-      - name: Check if patch directory exists
-        run: |
-          if [ ! -d "env.PATCH_DIR" ]; then
-            echo "Patch directory does not exist. ${{ env.PATCH_DIR }}"
-            echo "false" >> $PATCH_EXISTS
-            echo ${{ env.PATCH_EXISTS }}
-          fi
+          
 
       # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
       - name: Apply patches
@@ -38,7 +29,13 @@ jobs:
               fi
             fi
           done
-        if: ${{ env.PATCH_EXISTS }}
+        if: |
+          if [ ! -d "env.PATCH_DIR" ]; then
+            echo "Patch directory does not exist. ${{ env.PATCH_DIR }}"
+            return false
+          fi
+          return true
+
 
       - name: Cleanup
         run: rm -rf customisation
