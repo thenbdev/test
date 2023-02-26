@@ -14,9 +14,13 @@ jobs:
         with:
           repository: thenbdev/Customisations
           path: customisation
-          
 
-      # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
+      - name: Logging
+        run: |
+          ls
+          pwd
+          ls customisation/patches
+
       - name: Apply patches
         if: hashFiles('env.PATCH_DIR')!=''
         run: |
@@ -30,7 +34,6 @@ jobs:
               fi
             fi
           done
-
 
       - name: Cleanup
         run: rm -rf customisation
