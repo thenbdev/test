@@ -29,12 +29,7 @@ jobs:
               fi
             fi
           done
-        if: |
-          if [ ! -d "env.PATCH_DIR" ]; then
-            echo "Patch directory does not exist. ${{ env.PATCH_DIR }}"
-            return false
-          fi
-          return true
+        if: test -e env.PATCH_DIR
 
 
       - name: Cleanup
