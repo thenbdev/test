@@ -18,6 +18,7 @@ jobs:
 
       # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
       - name: Apply patches
+        if: hashFiles('env.PATCH_DIR')!=''
         run: |
           for patch in "$PATCH_DIR"*.patch; do
             if [[ -f "$patch" ]]; then
@@ -29,7 +30,6 @@ jobs:
               fi
             fi
           done
-        if: bash -c "test -e 'env.PATCH_DIR'"
 
 
       - name: Cleanup
