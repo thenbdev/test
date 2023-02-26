@@ -26,11 +26,11 @@ jobs:
             for patch in "$PATCH_DIR"/*.patch; do
               if [ -f "$patch" ]; then
                 echo "Starting $patch"
-                if git apply --verbose  --check "$patch" > /dev/null 2>&1; then
+                if git apply --verbose  --check "$patch"; then
                   echo "Patch $(basename "${patch%.*}") was already applied, skipping"
                 else
                   echo "Partially applied, or not applied at all"
-                  if git apply --verbose --reverse --check "$patch" > /dev/null 2>&1; then
+                  if git apply --verbose --reverse --check "$patch"; then
                       git apply --reject --whitespace=fix "$patch" || exit 1
                       echo "Applied patch ${patch##*/}"
                   else
