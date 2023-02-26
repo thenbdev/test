@@ -25,7 +25,7 @@ jobs:
           for patch in "$PATCH_DIR"/*.patch; do
             echo "Starting ${patch}"
             if [[ -f "$patch" ]]; then
-              if git log --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
+              if git log --debug --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
                 echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
               else
                 git apply --reject --whitespace=fix "$patch" || exit 1
