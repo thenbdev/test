@@ -37,7 +37,7 @@ jobs:
               fi
             fi
           done
-        if: ${{ env.PATCH_EXISTS) }}
+        if: ${{ env.PATCH_EXISTS }}
 
       - name: Cleanup
         run: git rm customisation
