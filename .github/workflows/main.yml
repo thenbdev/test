@@ -10,6 +10,8 @@ jobs:
       - name: Apply new patches
         run: |
           ls
+          pwd
+          ls ..
 
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -42,10 +44,9 @@ jobs:
         # TODO: figure out where is the file and replace it. currently static handling
         run: |
           cd erpnext/public/images
-          rm erpnext-logo.svg erpnext-logo.png erpnext-favicon.svg
-          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.svg
-          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.png
-          wget http://thenb.nbnext.in/assets/erpnext/images/erpnext-favicon.svg
+          wget -N http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.svg
+          wget -N http://thenb.nbnext.in/assets/erpnext/images/erpnext-logo.png
+          wget -N http://thenb.nbnext.in/assets/erpnext/images/erpnext-favicon.svg
 
 
       - name: Restore unwanted changes
