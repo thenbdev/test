@@ -19,20 +19,27 @@ jobs:
         # if: hashFiles('$PATCH_DIR')!=''  #TODO: why is this not working
         run: |
           shopt -s nullglob
-          [ -d "$PATCH_DIR" ] || { echo "Patch directory $PATCH_DIR not found."; exit 0; }
 
-          ls $PATCH_DIR
-          for patch in "$PATCH_DIR"/*.patch; do
-            echo "Starting ${patch}"
-            if [[ -f "$patch" ]]; then
-              if git log --debug --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
-                echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
-              else
-                git apply --reject --whitespace=fix "$patch" || exit 1
-                echo "Applied patch $(basename "${patch%.*}")"
+          if [ -d "$PATCH_DIR" ]; then
+            echo "Patches found in $PATCH_DIR:"
+            echo "$PATCH_DIR"/*.patch
+            for patch in "$PATCH_DIR"/*.patch; do
+              if [ -f "$patch" ]; then
+                if git apply --check "$patch" > /dev/null 2>&1; then
+                  echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
+                else
+                  if git apply --reverse --check "$patch" > /dev/null 2>&1; then
+                      git apply --reject --whitespace=fix "$patch" || exit 1
+                      echo "Applied patch ${patch##*/}"
+                  else
+                      echo "Patch $(basename "${patch%.*}") has already been applied, skipping"
+                  fi
+                fi
               fi
-            fi
-          done
+            done
+          else
+            echo "Patch directory $PATCH_DIR not found."
+          fi
 
       - name: Cleanup
         run: rm -rf customisation
