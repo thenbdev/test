@@ -21,7 +21,8 @@ jobs:
         run: |
           if [ ! -d "env.PATCH_DIR" ]; then
             echo "Patch directory does not exist. ${{ env.PATCH_DIR }}"
-            echo "false" >> env.PATCH_EXISTS
+            echo "false" >> $PATCH_EXISTS
+            echo ${{ env.PATCH_EXISTS }}
           fi
 
       # TODO: Apply patches given the repo (frappe/erpnext/hrms/payments/etc...)
