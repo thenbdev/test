@@ -22,7 +22,7 @@ jobs:
           [ -d "$PATCH_DIR" ] || { echo "Patch directory $PATCH_DIR not found."; exit 0; }
 
           ls $PATCH_DIR
-          for patch in "$PATCH_DIR"/**/*.patch; do
+          for patch in "$PATCH_DIR"/*.patch; do
             echo "Starting ${patch}"
             if [[ -f "$patch" ]]; then
               if git log --grep="$(basename "${patch%.*}")" -1 > /dev/null; then
